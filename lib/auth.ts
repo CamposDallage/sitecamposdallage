@@ -3,18 +3,24 @@ import { cookies } from 'next/headers';
 import bcrypt from 'bcryptjs';
 import prisma from './db';
 
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'default-secret-change-me');
+// CETTE CLÉ DOIT ÊTRE EXACTEMENT LA MÊME QUE DANS LE FICHIER LOGIN
+const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'super-secret-key-camposdallage-12345');
 
-export async function verifyPassword(p: string, h: string) { return bcrypt.compare(p, h); }
+export async function verifyPassword(p: string, h: string) { 
+  return bcrypt.compare(p, h); 
+}
 
 export async function createToken(payload: any) {
-  return new SignJWT(payload).setProtectedHeader({ alg: 'HS256' }).setExpirationTime('7d').sign(JWT_SECRET);
+  return new SignJWT(payload)
+    .setProtectedHeader({ alg: 'HS256' })
+    .setExpirationTime('7d')
+    .sign(JWT_SECRET);
 }
 
 export async function setSession(payload: any) {
   const token = await createToken(payload);
-  const c = cookies(); // Corrigé pour Next.js 14 (pas de await)
-  c.set('admin_session', token, { 
+  const cookieStore = cookies();
+  cookieStore.set('admin_session', token, { 
     httpOnly: true, 
     secure: process.env.NODE_ENV === 'production', 
     sameSite: 'lax', 
@@ -24,13 +30,16 @@ export async function setSession(payload: any) {
 }
 
 export async function getSession() {
-  const c = cookies(); // Corrigé pour Next.js 14 (pas de await)
-  const token = c.get('admin_session')?.value;
+  const cookieStore = cookies();
+  const token = cookieStore.get('admin_session')?.value;
   if (!token) return null;
+  
   try {
     const { payload } = await jwtVerify(token, JWT_SECRET);
     return payload as any;
-  } catch { return null; }
+  } catch { 
+    return null; 
+  }
 }
 
 export async function authenticateUser(email: string, password: string) {
