@@ -2,18 +2,18 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 
 const services = [
-  { slug: 'dallage-industriel', title: 'Dallage industriel', desc: 'Haute performance pour entrepôts, usines, parkings.', target: 'pro' },
-  { slug: 'beton-imprime', title: 'Béton imprimé', desc: 'Motifs personnalisables pour terrasses et allées.' },
-  { slug: 'beton-desactive', title: 'Béton désactivé', desc: 'Aspect gravillonné élégant et durable.' },
-  { slug: 'beton-blaye', title: 'Béton balayé', desc: 'Finition striée économique et antidérapante.' },
-  { slug: 'beton-drainant', title: 'Béton drainant', desc: 'Solution écologique laissant passer l'eau.' },
-  { slug: 'beton-quartzé', title: 'Béton quartzé', desc: 'Surface ultra-résistante pour usage intensif.', target: 'pro' },
-  { slug: 'moquette-marbre', title: 'Moquette de marbre', desc: 'Résine et granulats de marbre décoratifs.' },
-  { slug: 'terrazzo', title: 'Terrazzo', desc: 'Revêtement haut de gamme extrêmement durable.' },
-  { slug: 'beton-poli', title: 'Béton poli', desc: 'Finition brillante et facile d'entretien.' },
-  { slug: 'resine-epoxy', title: 'Résine époxy', desc: 'Revêtement résistant aux produits chimiques.' },
-  { slug: 'resine-pailletée', title: 'Résine pailletée', desc: 'Finition décorative avec paillettes.' },
-  { slug: 'renovation-dalle', title: 'Rénovation de dalle', desc: 'Remise à neuf de vos dalles existantes.' }
+  { slug: 'dallage-industriel', title: 'Dallage industriel', desc: 'Haute performance pour entrepots, usines, parkings.', target: 'pro' },
+  { slug: 'beton-imprime', title: 'Beton imprime', desc: 'Motifs personnalisables pour terrasses et allees.' },
+  { slug: 'beton-desactive', title: 'Beton desactive', desc: 'Aspect gravillonne elegant et durable.' },
+  { slug: 'beton-blaye', title: 'Beton balaye', desc: 'Finition striee economique et antiderapante.' },
+  { slug: 'beton-drainant', title: 'Beton drainant', desc: 'Solution ecologique laissant passer l\'eau.' },
+  { slug: 'beton-quartze', title: 'Beton quartze', desc: 'Surface ultra-resistante pour usage intensif.', target: 'pro' },
+  { slug: 'moquette-marbre', title: 'Moquette de marbre', desc: 'Resine et granulats de marbre decoratifs.' },
+  { slug: 'terrazzo', title: 'Terrazzo', desc: 'Revatement haut de gamme extremement durable.' },
+  { slug: 'beton-poli', title: 'Beton poli', desc: 'Finition brillante et facile d\'entretien.' },
+  { slug: 'resine-epoxy', title: 'Resine epoxy', desc: 'Revatement resistant aux produits chimiques.' },
+  { slug: 'resine-pailletee', title: 'Resine pailletee', desc: 'Finition decorative avec paillettes.' },
+  { slug: 'renovation-dalle', title: 'Renovation de dalle', desc: 'Remise a neuf de vos dalles existantes.' }
 ];
 
 export default function ServicesGrid() {
@@ -22,7 +22,7 @@ export default function ServicesGrid() {
       <div className="container">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-primary-900 mb-4">Nos prestations</h2>
-          <p className="text-concrete-600 text-lg max-w-2xl mx-auto">Une gamme complète de solutions en béton décoratif, dallage industriel et rénovation.</p>
+          <p className="text-concrete-600 text-lg max-w-2xl mx-auto">Une gamme complete de solutions en beton decoratif, dallage industriel et renovation.</p>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {services.map(s => (
