@@ -13,12 +13,18 @@ export async function createToken(payload: any) {
 
 export async function setSession(payload: any) {
   const token = await createToken(payload);
-  const c = await cookies();
-  c.set('admin_session', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 60*60*24*7, path: '/' });
+  const c = cookies(); // Corrigé pour Next.js 14 (pas de await)
+  c.set('admin_session', token, { 
+    httpOnly: true, 
+    secure: process.env.NODE_ENV === 'production', 
+    sameSite: 'lax', 
+    maxAge: 60 * 60 * 24 * 7, 
+    path: '/' 
+  });
 }
 
 export async function getSession() {
-  const c = await cookies();
+  const c = cookies(); // Corrigé pour Next.js 14 (pas de await)
   const token = c.get('admin_session')?.value;
   if (!token) return null;
   try {
