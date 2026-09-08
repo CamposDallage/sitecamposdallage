@@ -1,38 +1,49 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import bcrypt from 'bcryptjs';
-import { authenticateUser, setSession } from '@/lib/auth';
+import { SignJWT } from 'jose';
+import { cookies } from 'next/headers';
+
+const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'super-secret-key-camposdallage-12345');
 
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json();
 
-    // AUTO-CREATION DE L'ADMIN SI LA BASE EST VIDE
-    const adminExists = await prisma.user.findUnique({ where: { email: 'admin@camposdallage.com' } });
-    if (!adminExists) {
+    // 1. Auto-création de l'admin si la base est vide
+    let user = await prisma.user.findUnique({ where: { email: 'admin@camposdallage.com' } });
+    if (!user) {
       const pwd = await bcrypt.hash('admin123', 10);
-      await prisma.user.create({
+      user = await prisma.user.create({
         data: { email: 'admin@camposdallage.com', password: pwd, firstName: 'Admin', lastName: 'Campos', role: 'ADMIN' }
       });
-      await prisma.siteSettings.upsert({
-        where: { id: 'settings' },
-        update: {},
-        create: { id: 'settings', companyName: 'CamposDallage', vatRate: 20.0 }
-      });
     }
 
-    if (!email || !password) {
-      return NextResponse.json({ error: 'Email et mot de passe requis' }, { status: 400 });
+    // 2. Vérification du mot de passe
+    const isValid = await bcrypt.compare(password, user.password);
+    if (!isValid) {
+      return NextResponse.json({ error: 'Mot de passe incorrect' }, { status: 401 });
     }
 
-    const payload = await authenticateUser(email, password);
-    if (!payload) {
-      return NextResponse.json({ error: 'Identifiants incorrects' }, { status: 401 });
-    }
+    // 3. Création du token de session
+    const token = await new SignJWT({ userId: user.id, email: user.email, role: user.role })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setExpirationTime('7d')
+      .sign(JWT_SECRET);
 
-    await setSession(payload);
+    // 4. Sauvegarde du cookie (Compatible Next.js 14)
+    const cookieStore = cookies();
+    cookieStore.set('admin_session', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7,
+      path: '/'
+    });
+
     return NextResponse.json({ success: true });
   } catch (error: any) {
-    return NextResponse.json({ error: 'Erreur de connexion' }, { status: 500 });
+    // CETTE LIGNE VA NOUS DIRE EXACTEMENT CE QUI NE VA PAS
+    return NextResponse.json({ error: error.message || String(error) }, { status: 500 });
   }
 }
