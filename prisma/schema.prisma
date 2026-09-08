@@ -1,0 +1,119 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  firstName String?
+  lastName  String?
+  role      String   @default("ADMIN")
+  createdAt DateTime @default(now())
+}
+
+model Prestation {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  name         String
+  shortName    String
+  description  String
+  advantages   String
+  applications String
+  isActive     Boolean  @default(true)
+  displayOrder Int      @default(0)
+  targetAudience String @default("BOTH")
+  pricing      Pricing[]
+  quotes       Quote[]
+  createdAt    DateTime @default(now())
+}
+
+model Pricing {
+  id              String   @id @default(cuid())
+  prestationId    String
+  prestation      Prestation @relation(fields: [prestationId], references: [id], onDelete: Cascade)
+  targetAudience  String
+  pricePerSqm     Float
+  minimumPrice    Float    @default(0)
+  zone            String   @default("")
+  isActive        Boolean  @default(true)
+  @@unique([prestationId, targetAudience, zone])
+}
+
+model PricingOption {
+  id        String  @id @default(cuid())
+  name      String
+  slug      String  @unique
+  price     Float
+  priceType String  @default("FIXED")
+  isActive  Boolean @default(true)
+}
+
+model PricingZone {
+  id          String   @id @default(cuid())
+  name        String
+  postalCodes String
+  travelCost  Float    @default(0)
+}
+
+model Prospect {
+  id           String   @id @default(cuid())
+  firstName    String
+  lastName     String
+  email        String
+  phone        String
+  postalCode   String?
+  city         String?
+  customerType String   @default("INDIVIDUAL")
+  status       String   @default("NEW")
+  source       String?
+  createdAt    DateTime @default(now())
+  quotes       Quote[]
+  appointments Appointment[]
+}
+
+model Quote {
+  id                 String   @id @default(cuid())
+  prospectId         String
+  prospect           Prospect @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+  prestationId       String?
+  prestation         Prestation? @relation(fields: [prestationId], references: [id])
+  surface            Float
+  basePrice          Float
+  optionsTotal       Float    @default(0)
+  travelCost         Float    @default(0)
+  vatRate            Float    @default(20.0)
+  totalHt            Float
+  totalTtc           Float
+  complementaryWorks String   @default("")
+  description        String?
+  isProvisional      Boolean  @default(true)
+  status             String   @default("DRAFT")
+  createdAt          DateTime @default(now())
+}
+
+model Appointment {
+  id        String   @id @default(cuid())
+  prospectId String?
+  prospect  Prospect? @relation(fields: [prospectId], references: [id])
+  type      String
+  date      DateTime
+  duration  Int      @default(60)
+  notes     String?
+  status    String   @default("CONFIRMED")
+  createdAt DateTime @default(now())
+}
+
+model SiteSettings {
+  id          String  @id @default("settings")
+  companyName String  @default("CamposDallage")
+  phone       String?
+  email       String?
+  adminEmail  String?
+  vatRate     Float   @default(20.0)
+}
